@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
@@ -11,16 +12,17 @@ import UserManagement from "./pages/UserManagment";
 
 const App: React.FC = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("accessToken");
     if (
-      isAuthenticated === null ||
-      isAuthenticated == "" ||
-      isAuthenticated === "undefined"
+      (isAuthenticated === null ||
+        isAuthenticated === "" ||
+        isAuthenticated === "undefined") &&
+      location.pathname !== "/register"
     ) {
       navigate("/login");
-    } else {
+    } else if (isAuthenticated && location.pathname === "/") {
       navigate("/userManagement");
     }
   }, [navigate]);
