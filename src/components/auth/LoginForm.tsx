@@ -22,9 +22,10 @@ const LoginForm: React.FC = () => {
         alert("Вы успешно вошли!");
         navigate("/userManagement");
       }
-    } catch (error) {
-      alert(error);
-    }
+      if (error) {
+        setError(error.message);
+      }
+    } catch (error) {}
   };
   return (
     <form
