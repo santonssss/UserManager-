@@ -6,7 +6,6 @@ const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  console.log(sessionStorage.getItem("accessToken"));
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +14,9 @@ const LoginForm: React.FC = () => {
         password: password,
         email: email,
       });
+      if (data && data.user && data.user.email) {
+        sessionStorage.setItem("email", data.user.email);
+      }
       if (data.session?.access_token) {
         sessionStorage.setItem("accessToken", data.session.access_token);
         alert("Вы успешно вошли!");

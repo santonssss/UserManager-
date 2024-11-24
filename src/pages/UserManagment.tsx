@@ -15,6 +15,48 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
+
+  const checkUserStatus = async () => {
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error) {
+      console.error(
+        "Ошибка при получении текущего пользователя:",
+        error.message
+      );
+      return false;
+    }
+
+    const user = data?.user;
+
+    if (user) {
+      const { data: profile, error: statusError } = await supabase
+        .from("profiles")
+        .select("status")
+        .eq("email", user.email)
+        .single();
+
+      if (statusError) {
+        console.error(
+          "Ошибка при получении статуса пользователя:",
+          statusError.message
+        );
+        return false;
+      }
+
+      if (profile && profile.status === "blocked") {
+        sessionStorage.removeItem("accessToken");
+        alert(
+          "вы заблокированы, поэтому вы не можете блокировать других пользователей!"
+        );
+        navigate("/login");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const fetchUsers = async () => {
     const { data, error } = await supabase.from("profiles").select("*");
 
@@ -61,6 +103,18 @@ const UserManagement: React.FC = () => {
   };
 
   const handleBlockUser = async (id: string) => {
+    if (!(await checkUserStatus())) return;
+
+    const { data } = await supabase.auth.getUser();
+    const currentUserId = data?.user?.id;
+
+    if (currentUserId === id) {
+      alert(
+        "Вы не можете блокировать других пользователей, когда вы заблокированы."
+      );
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ status: "blocked" })
@@ -79,6 +133,18 @@ const UserManagement: React.FC = () => {
   };
 
   const handleUnblockUser = async (id: string) => {
+    if (!(await checkUserStatus())) return;
+
+    const { data } = await supabase.auth.getUser();
+    const currentUserId = data?.user?.id;
+
+    if (currentUserId === id) {
+      alert(
+        "Вы не можете разблокировать других пользователей, когда вы заблокированы."
+      );
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ status: "active" })
@@ -97,6 +163,8 @@ const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = async (id: string) => {
+    if (!(await checkUserStatus())) return;
+
     const { error } = await supabase.from("profiles").delete().eq("id", id);
 
     if (error) {
@@ -106,10 +174,12 @@ const UserManagement: React.FC = () => {
     }
     fetchUsers();
   };
+
   const handleLogout = () => {
     sessionStorage.removeItem("accessToken");
     navigate("/login");
   };
+
   return (
     <div className="container mt-5">
       <div className="d-flex flex-column mb-3">
