@@ -23,8 +23,6 @@ const SignUpForm: React.FC = () => {
       });
 
       if (error) {
-        console.log(error);
-
         throw new Error(error.message);
       }
 
@@ -45,7 +43,7 @@ const SignUpForm: React.FC = () => {
         if (insertError) {
           throw new Error(insertError.message);
         }
-        setSuccess("Пожалуйста подтвердите почту!");
+        setSuccess("Отлично, теперь осталось залогиниться с вашими данными!");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
