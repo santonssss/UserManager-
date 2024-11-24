@@ -1,26 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
+import UserManagement from "./pages/UserManagment";
 
-function App() {
+const App: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAuthenticated = sessionStorage.getItem("accessToken");
+    if (
+      isAuthenticated === null ||
+      isAuthenticated == "" ||
+      isAuthenticated === "undefined"
+    ) {
+      navigate("/login");
+    } else {
+      navigate("/userManagement");
+    }
+  }, [navigate]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/userManagement" element={<UserManagement />} />
+      <Route path="*" element={<LoginPage />} />
+    </Routes>
   );
-}
+};
 
 export default App;
