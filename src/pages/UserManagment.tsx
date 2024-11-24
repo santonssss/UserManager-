@@ -44,13 +44,13 @@ const UserManagement: React.FC = () => {
         return false;
       }
 
-      if (profile && profile.status === "blocked") {
-        sessionStorage.removeItem("accessToken");
-        alert(
-          "вы заблокированы, поэтому вы не можете блокировать других пользователей!"
-        );
-        navigate("/login");
-        return false;
+      if (profile) {
+        if (profile.status === "blocked") {
+          sessionStorage.removeItem("accessToken");
+          alert("Вы заблокированы, поэтому не можете выполнять действия!");
+          navigate("/login");
+          return false;
+        }
       }
     }
 
