@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   id: string;
@@ -13,7 +14,7 @@ interface User {
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
-
+  const navigate = useNavigate();
   const fetchUsers = async () => {
     const { data, error } = await supabase.from("profiles").select("*");
 
@@ -105,7 +106,10 @@ const UserManagement: React.FC = () => {
     }
     fetchUsers();
   };
-
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken");
+    navigate("/login");
+  };
   return (
     <div className="container mt-5">
       <div className="d-flex flex-column mb-3">
@@ -135,6 +139,9 @@ const UserManagement: React.FC = () => {
           }
         >
           Удалить
+        </button>{" "}
+        <button className="btn btn-secondary mt-3" onClick={handleLogout}>
+          Выйти
         </button>
       </div>
       <table className="table table-striped">
